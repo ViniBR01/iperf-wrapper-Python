@@ -46,9 +46,13 @@ def main(argv):
     while time.time() < t_end:
         interval = get_interval(min_interval, max_interval)
         time.sleep(interval)
-        json_out = run_iperf(server_ip, size)
-        mbps_out = extract_bps(json_out)/1024/1024
-        print(mbps_out)
+        try:
+            json_out = run_iperf(server_ip, size)
+        except:
+            continue
+        else:
+            mbps_out = extract_bps(json_out)/1024/1024
+            print(mbps_out)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
