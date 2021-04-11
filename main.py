@@ -22,15 +22,15 @@ def main(argv):
     server_ip = "192.168.0.102"
     
     try:
-        opts, args = getopt.getopt(argv,"hs:l:i:t:g:",["file-size=","length=","server-ip=","max-interval=","min-interval="])
+        opts, args = getopt.getopt(argv,"hf:l:i:t:g:",["file-size=","length=","server-ip=","max-interval=","min-interval="])
     except getopt.GetoptError:
-        print('main.py -i <server-ip> -s <file-size> -l <time-length> -t <max-interval> -g <min-interval>')
+        print('main.py -i <server-ip> -f <file-size> -l <time-length> -t <max-interval> -g <min-interval>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('main.py -i <server-ip> -s <file-size> -l <time-length> -t <max-interval> -g <min-interval>')
+            print('main.py -i <server-ip> -f <file-size> -l <time-length> -t <max-interval> -g <min-interval>')
             sys.exit()
-        elif opt in ("-s", "--file-size"):
+        elif opt in ("-f", "--file-size"):
             size = int(arg)
         elif opt in ("-l", "--length"):
             t_end = time.time() + int(arg)
