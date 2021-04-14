@@ -128,5 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Logfiles
+# Logfiles & images
 *.txt
+*.png
