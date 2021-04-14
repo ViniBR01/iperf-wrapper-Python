@@ -23,15 +23,18 @@ def main(argv):
     max_interval = 1.5 #seconds
     t_end = time.time() + 10
     server_ip = "192.168.0.102"
+    upload_ratio = 0
+
+    usage_str = 'main.py -i <server-ip> -f <file-size> -l <time-length> -t <max-interval> -g <min-interval> -m <ratio-of-uploads>'
     
     try:
-        opts, args = getopt.getopt(argv,"hf:l:i:t:g:",["file-size=","length=","server-ip=","max-interval=","min-interval="])
+        opts, args = getopt.getopt(argv,"hf:l:i:t:g:m:",["file-size=","length=","server-ip=","max-interval=","min-interval="])
     except getopt.GetoptError:
-        print('main.py -i <server-ip> -f <file-size> -l <time-length> -t <max-interval> -g <min-interval>')
+        print(usage_str)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('main.py -i <server-ip> -f <file-size> -l <time-length> -t <max-interval> -g <min-interval>')
+            print(usage_str)
             sys.exit()
         elif opt in ("-f", "--file-size"):
             size = int(arg)
@@ -43,19 +46,36 @@ def main(argv):
             min_interval = float(arg)
         elif opt in ("-i", "--server-ip"):
             server_ip = arg
+        elif opt in ("-i", "--server-ip"):
+            upload_ratio = int(arg)
 
-    # print("fileSize = " + str(size))
+    if (upload_ratio == 0):
+        while time.time() < t_end:
+            interval = get_interval(min_interval, max_interval)
+            time.sleep(interval)
+            try:
+                json_out = run_iperf_DL(server_ip, size)
+            except:
+                continue
+            else:
+                mbps_out = extract_bps(json_out)/1024/1024
+                print(mbps_out)
 
-    while time.time() < t_end:
-        interval = get_interval(min_interval, max_interval)
-        time.sleep(interval)
-        try:
-            json_out = run_iperf_DL(server_ip, size)
-        except:
-            continue
-        else:
-            mbps_out = extract_bps(json_out)/1024/1024
-            print(mbps_out)
+    elif (upload_ratio == 1):
+        while time.time() < t_end:
+            interval = get_interval(min_interval, max_interval)
+            time.sleep(interval)
+            try:
+                json_out = run_iperf_UL(server_ip, size)
+            except:
+                continue
+            else:
+                mbps_out = extract_bps(json_out)/1024/1024
+                print(mbps_out)
+    
+    else:
+        print("Mixed Traffic is not coded yet.")
+        pass
 
 if __name__ == "__main__":
     main(sys.argv[1:])
