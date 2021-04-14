@@ -5,10 +5,10 @@ import random
 import sys, getopt
 
 def run_iperf_DL(server_ip, filesize):
-    return subprocess.check_output(["iperf3", "-c", server_ip, "-J", "-M 1460", "-n "+str(filesize)])
+    return subprocess.check_output(["iperf3", "-c", server_ip, "-J", "-M 1460", "-l 1460", "-n "+str(filesize)])
 
 def run_iperf_UL(server_ip, filesize):
-    return subprocess.check_output(["iperf3", "-c", server_ip, "-J", "-M 1460", "-n "+str(filesize), "-R"])
+    return subprocess.check_output(["iperf3", "-c", server_ip, "-J", "-M 1460", "-l 1460", "-n "+str(filesize), "-R"])
 
 def extract_bps(json_out):
     dict_out = json.loads(json_out)
@@ -28,7 +28,7 @@ def main(argv):
     usage_str = 'main.py -i <server-ip> -f <file-size> -l <time-length> -t <max-interval> -g <min-interval> -m <ratio-of-uploads>'
     
     try:
-        opts, args = getopt.getopt(argv,"hf:l:i:t:g:m:",["file-size=","length=","server-ip=","max-interval=","min-interval="])
+        opts, args = getopt.getopt(argv,"hf:l:i:t:g:m:",["file-size=","length=","server-ip=","max-interval=","min-interval=","upload-ratio="])
     except getopt.GetoptError:
         print(usage_str)
         sys.exit(2)
@@ -46,7 +46,7 @@ def main(argv):
             min_interval = float(arg)
         elif opt in ("-i", "--server-ip"):
             server_ip = arg
-        elif opt in ("-i", "--server-ip"):
+        elif opt in ("-m", "--upload-ratio"):
             upload_ratio = int(arg)
 
     if (upload_ratio == 0):
