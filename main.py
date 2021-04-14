@@ -47,7 +47,7 @@ def main(argv):
         elif opt in ("-i", "--server-ip"):
             server_ip = arg
         elif opt in ("-m", "--upload-ratio"):
-            upload_ratio = int(arg)
+            upload_ratio = float(arg)
 
     if (upload_ratio == 0):
         while time.time() < t_end:
