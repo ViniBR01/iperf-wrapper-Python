@@ -6,7 +6,7 @@ filesize=300000 #B
 runtime=300 #sec
 mininterval=0.00 #sec
 maxinterval=0.41 #sec
-uploadratio=0.5
+uploadratio=1
 
 mkdir 00_41
 mkdir 00_62
