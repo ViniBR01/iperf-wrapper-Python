@@ -85,6 +85,11 @@ for i in range(3):
 # print(average[0]) # 3 lists each with 10 values
 # print(error_bar[0]) # 3 lists each with 10 values
 
+# Normalize
+tcp_speed = 80
+average = np.array(average)/tcp_speed
+error_bar = np.array(error_bar)/tcp_speed
+
 #plotting
 max_interval = np.array([0.41, 0.62, 0.94, 1.42, 1.89, 2.84, 3.79, 5.69, 11.38, 56.89])
 filesize = 300000*8
@@ -100,5 +105,20 @@ ax.errorbar(x[0:i], average[0][0:i], yerr=error_bar[0][0:i])
 ax.errorbar(x[0:i], average[1][0:i], yerr=error_bar[1][0:i])
 ax.errorbar(x[0:i], average[2][0:i], yerr=error_bar[2][0:i])
 ax.legend(['SU','MU-Reports','MU-Genie'])
-plt.savefig('plot.png')
+ax.set(xlim=(0, 100), ylim=(0, 0.6))
+ax.grid(color='k', linestyle='--', linewidth=1)
+plt.title("Average TCP Download throughput of a 300kB file - 32 stations")
+plt.xlabel('Aggregate traffic load in network, in % [Normalized by MIMO PHY rate]') 
+plt.ylabel('Measured TCP Throughput for downloads\n[Normalized by the TCP speed test result]') 
+plt.savefig('TCP-Throughput-Downloads-32sta.png')
 
+fig2, ax2 = plt.subplots()
+ax2.plot(x[0:i], 100*(average[1][0:i] / average[0][0:i] - 1), '*-', color='tab:orange')
+ax2.plot(x[0:i], 100*(average[2][0:i] / average[0][0:i] - 1), '*-', color='tab:green')
+ax2.legend(['MU-Reports / SU','MU-Genie / SU'])
+ax2.set(xlim=(0, 100), ylim=(0, 70))
+ax2.grid(color='k', linestyle='--', linewidth=1)
+plt.title("Relative Gain of the 2 MU modes over the SU Uplink")
+plt.xlabel('Aggregate traffic load in network, in % [Normalized by MIMO PHY rate]') 
+plt.ylabel('Gain in Throughput for TCP downloads, in %') 
+plt.savefig('MU-gains.png')
