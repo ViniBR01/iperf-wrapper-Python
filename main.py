@@ -17,6 +17,9 @@ def extract_bps(json_out):
 def get_interval(min_interval, max_interval):
     return random.random()*(max_interval - min_interval) + min_interval
 
+def print_JSON(direction, size, max_interval, upload_ratio, json_out):
+    pass
+
 def main(argv):
     size = 500000 #bytes
     min_interval = 0.0 #seconds
@@ -74,8 +77,22 @@ def main(argv):
                 print(mbps_out)
     
     else:
-        print("Mixed Traffic is not coded yet.")
-        pass
+        while (time.time() < t_end):
+            interval = get_interval(min_interval, max_interval)
+            time.sleep(interval)
+            direction = random.choice(['UL', 'DL'])
+            try:
+                if direction == 'DL':
+                    json_out = run_iperf_DL(server_ip, size)
+                else:
+                    json_out = run_iperf_UL(server_ip, size)
+            except:
+                continue
+            else:
+                mbps_out = extract_bps(json_out)/1024/1024
+                print(mbps_out)
+                # Call function that will format output and print to stdout
+                print_JSON(direction, size, max_interval, upload_ratio, json_out)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
