@@ -10,14 +10,20 @@ def run_iperf_DL(server_ip, filesize):
 def run_iperf_UL(server_ip, filesize):
     return subprocess.check_output(["iperf3", "-c", server_ip, "-J", "-M 1460", "-l 1460", "-n "+str(filesize), "-R"])
 
+def get_interval(min_interval, max_interval):
+    return random.random()*(max_interval - min_interval) + min_interval
+
 def extract_bps(json_out):
     dict_out = json.loads(json_out)
     return dict_out["end"]["streams"][0]["receiver"]["bits_per_second"]
 
-def get_interval(min_interval, max_interval):
-    return random.random()*(max_interval - min_interval) + min_interval
-
 def print_JSON(direction, size, max_interval, upload_ratio, json_out):
+    string_out = '{ '
+    string_out += '"mode" : "' + direction + '", '
+    string_out += '"filesize" : ' + str(size) + ', '
+    string_out += '"mbps" : ' + str(extract_bps(json_out)/1024/1024) + ' '
+    string_out += '},'
+    print(string_out)
     pass
 
 def main(argv):
@@ -51,48 +57,26 @@ def main(argv):
             server_ip = arg
         elif opt in ("-m", "--upload-ratio"):
             upload_ratio = float(arg)
-
-    if (upload_ratio == 0):
-        while time.time() < t_end:
-            interval = get_interval(min_interval, max_interval)
-            time.sleep(interval)
-            try:
-                json_out = run_iperf_DL(server_ip, size)
-            except:
-                continue
-            else:
-                mbps_out = extract_bps(json_out)/1024/1024
-                print(mbps_out)
-
-    elif (upload_ratio == 1):
-        while time.time() < t_end:
-            interval = get_interval(min_interval, max_interval)
-            time.sleep(interval)
-            try:
-                json_out = run_iperf_UL(server_ip, size)
-            except:
-                continue
-            else:
-                mbps_out = extract_bps(json_out)/1024/1024
-                print(mbps_out)
     
-    else:
-        while (time.time() < t_end):
-            interval = get_interval(min_interval, max_interval)
-            time.sleep(interval)
-            direction = random.choice(['UL', 'DL'])
-            try:
-                if direction == 'DL':
-                    json_out = run_iperf_DL(server_ip, size)
-                else:
-                    json_out = run_iperf_UL(server_ip, size)
-            except:
-                continue
+    print('[')
+
+    while (time.time() < t_end):
+        interval = get_interval(min_interval, max_interval)
+        time.sleep(interval)
+        direction = random.choices(['UL', 'DL'], weights=[upload_ratio, 1-upload_ratio])[0]
+
+        try:
+            if direction == 'DL':
+                json_out = run_iperf_DL(server_ip, size)
             else:
-                mbps_out = extract_bps(json_out)/1024/1024
-                print(mbps_out)
-                # Call function that will format output and print to stdout
-                print_JSON(direction, size, max_interval, upload_ratio, json_out)
+                json_out = run_iperf_UL(server_ip, size)
+        except:
+            continue
+        else:
+            # Call function that will format output and print to stdout
+            print_JSON(direction, size, max_interval, upload_ratio, json_out)
+
+    print('{}]')
 
 if __name__ == "__main__":
     main(sys.argv[1:])
